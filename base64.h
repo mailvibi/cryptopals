@@ -48,10 +48,45 @@ namespace cryptopals {
 				}
 				return ret;
 			}
+			static std::vector<std::byte> decode(const std::string& s)
+			{
+				std::vector<std::byte> ret;
+				auto decode_map = get_decodeMap();
+				if(s.length() % 4) {
+					std::cout << "input string not multiple of 4 " << std::endl;
+					return ret;
+				}
+				auto p = s.c_str();
+				for (int i = 0; i < s.length() ; i += 4) {
+					std::byte b;
+					b = std::byte{decode_map[static_cast<unsigned int>(p[i])] << 2}; 
+					b |= std::byte{(decode_map[static_cast<unsigned int>(p[i + 1])] >> 4) & std::byte{3}};
+					ret.push_back(b);
+					
+					b = std::byte{decode_map[static_cast<unsigned int>(p[i + 1])] << 4}; 
+					b |= std::byte{decode_map[static_cast<unsigned int>(p[i + 2])] >> 2};
+					ret.push_back(b);
+
+					b = std::byte{(decode_map[static_cast<unsigned int>(p[i + 2])] & std::byte{3}) << 6}; 
+					b |= std::byte{decode_map[static_cast<unsigned int>(p[i + 3])]};
+					ret.push_back(b);
+				}
+				return ret;
+			}
 		private :
 			static const std::string& get_encodeMap(void) {
 				static const std::string encode_map = { "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" };
 				return encode_map;
+			}
+			static std::array<std::byte, 256>& get_decodeMap(void) {
+				static std::array<std::byte, 256>decode_map{};
+				auto s = get_encodeMap();
+				unsigned int i = 0;
+				for (auto& c : s) {
+					decode_map[static_cast<unsigned int>(c)] = std::byte(i);
+					++i;
+				}
+				return decode_map;
 			}
 	};
 }

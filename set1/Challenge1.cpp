@@ -59,7 +59,8 @@ namespace cryptopals::set1 {
 		std::cout << "Challenge 4 : Key => " << std::to_integer<int>(probable_key_info_n_line.first.second) << std::endl;
 		std::cout << "\tDecrypted plain text : " << line << std::endl ;
 	}
-	void challenge5(void) {
+	void challenge5(void)
+	{
 		std::string pstr{"Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"};
 		std::string keystr{"ICE"};
 		auto strtob = [](std::string s) -> std::vector<std::byte> { std::vector<std::byte> r; for (auto i : s) r.push_back(std::byte(i)); return r;};
@@ -74,5 +75,22 @@ namespace cryptopals::set1 {
 		for (auto i : c)
 			std::cout << std::hex << std::to_integer<int>(i);
 		std::cout << std::endl;
+	}
+	void challenge6(void)
+	{
+		std::string s1{"this is a test"}, s2{"wokka wokka!!!"};
+		auto hd_s = hamming_distance(s1, s2);
+		std::cout << "(string) hamming distance = " << std::dec << hd_s << std::endl;
+		auto strtob = [](std::string s) -> std::vector<std::byte> { std::vector<std::byte> r; for (auto i : s) r.push_back(std::byte(i)); return r;};
+		std::vector v1 = strtob(s1);
+		std::vector v2 = strtob(s2);
+		auto hd_v = hamming_distance(v1, v2);
+		std::cout << "(bytes) hamming distance = " << std::dec << hd_v << std::endl;
+
+		std::string ipdata = readall("set1/6.txt");
+		auto data = b64::decode(ipdata);
+		for (auto i : data)
+			std::cout << std::hex << std::to_integer<int>(i);
+		std::cout << std::endl;		
 	}
 }

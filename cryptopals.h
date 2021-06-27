@@ -15,6 +15,10 @@ namespace cryptopals {
 	std::vector<std::byte> operator ^ (std::vector<std::byte> l, std::byte r);
 	std::pair<double, std::byte> most_probable_xor_enc_key(std::vector<std::byte> cbuf);
 	std::vector<std::byte> hexstringbytes(std::string s);
+	unsigned int hamming_distance(const std::string& s1, const std::string& s2);
+	unsigned int hamming_distance(const std::vector<std::byte>& v1, const std::vector<std::byte>& v2);
+	std::string readall(std::string filename);
+
 }
 
 #endif

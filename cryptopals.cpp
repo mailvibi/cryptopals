@@ -4,11 +4,14 @@
 #include <iostream>
 #include <vector>
 #include <array>
+#include <algorithm>
+#include <numeric>
+#include <filesystem>
+#include <fstream>
 #include "cryptopals.h"
 #include "base64.h"
 
 namespace cryptopals {
-
 	template<typename ...Args>
 	inline void log(Args && ...args)
 	{
@@ -134,5 +137,59 @@ namespace cryptopals {
 		}
 		return max_score_key;
 	}
-}
+	
+	unsigned int hamming_distance(const std::string& s1, const std::string& s2)
+	{
+		unsigned int hd = 0;
+		if ((s1.length() == 0) || (s1.length() != s2.length())) {
+			return hd;
+		}
+		std::cout << "length = "<< s1.length() << " args = " << s1 << " & " << s2 << std::endl; 
+/* 		std::vector<unsigned char> o1;
+		std::transform(std::begin(s1), std::end(s1), std::begin(s2),
+						std::back_inserter(o1),
+						[](unsigned char c1, unsigned char c2) -> unsigned char
+						{return c1 ^ c2;} );
+		return std::reduce(std::begin(o1), std::end(o1), 0, [](unsigned int s, unsigned char c) {
+							while(c) { if (c & 1) s++; c >>= 1; return s;} );
+ */	
+		for (int i = 0 ; i < s1.length() ; i++) {
+			std::cout << " i = " << s1[i] << "|" << s2[i] << " " << (s1[i] ^ s2[i]) << " hd = " << hd << std::endl;
+			for (unsigned char t = s1[i] ^ s2[i] ; t ; t >>= 1)
+				if (t & 1)
+					hd++;
+		}
+		return hd;	
+	}
 
+	std::string readall(std::string filename)
+	{
+		std::ifstream ip{filename};
+		const auto size = std::filesystem::file_size(filename);
+		std::string s{};
+		ip.read(s.data(), size);
+		return s;
+	}
+
+	unsigned int hamming_distance(const std::vector<std::byte>& v1, const std::vector<std::byte>& v2)
+	{
+		unsigned int hd = 0;
+		if ((v1.size() == 0) || (v1.size() != v2.size())) {
+			return hd;
+		}
+ /*
+	std::vector<std::byte> o1;
+		std::transform(std::begin(v1), std::end(v1), std::begin(v2),
+						std::back_inserter(o1),
+						[](std::byte b1, std::byte b2) {return b1 ^ b2;} );
+		return std::accumulate(std::begin(o1), std::end(o1), 0, [](unsigned int s, std::byte c)->unsigned int{ while(c != std::byte{0}) { if ((c & std::byte{1}) == std::byte{1}) { s++; c >>= 1;} }return s; } );
+*/
+		for (int i = 0 ; i < v1.size() ; i++) {
+			for (std::byte t = v1[i] ^ v2[i] ; t != static_cast<std::byte>(0) ; t >>= 1)
+				if ((t & static_cast<std::byte>(1)) == static_cast<std::byte>(1))
+					hd++;
+		}
+		return hd;
+ 
+	}
+}

@@ -7,4 +7,6 @@ int main()
     cryptopals::set1::challenge3();
     cryptopals::set1::challenge4();
     cryptopals::set1::challenge5();
+	cryptopals::set1::challenge6();
+
 }
