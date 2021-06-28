@@ -18,7 +18,8 @@ namespace cryptopals {
 	unsigned int hamming_distance(const std::string& s1, const std::string& s2);
 	unsigned int hamming_distance(const std::vector<std::byte>& v1, const std::vector<std::byte>& v2);
 	std::string readall(std::string filename);
-
+	unsigned int repeated_xor_key_size(const std::vector<std::byte>& v);
+	std::vector<std::byte> get_repeated_xor_key(const unsigned int keysize, const std::vector<std::byte>& v);
 }
 
 #endif

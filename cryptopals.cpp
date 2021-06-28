@@ -128,13 +128,6 @@ namespace cryptopals {
 				max_score_key.second = tmpkey;
 			}
 		}
-		if (max_score_key.first > max_eng_lang_score) {
-/* 			std::string s;
-			auto pbuf = cbuf ^ max_score_key.second;
-			for (auto k : pbuf)
-				s.push_back(std::to_integer<char>(k));
-			std::cout << "Probable plain text : " << s << std::endl ; */
-		}
 		return max_score_key;
 	}
 	
@@ -144,17 +137,9 @@ namespace cryptopals {
 		if ((s1.length() == 0) || (s1.length() != s2.length())) {
 			return hd;
 		}
-		std::cout << "length = "<< s1.length() << " args = " << s1 << " & " << s2 << std::endl; 
-/* 		std::vector<unsigned char> o1;
-		std::transform(std::begin(s1), std::end(s1), std::begin(s2),
-						std::back_inserter(o1),
-						[](unsigned char c1, unsigned char c2) -> unsigned char
-						{return c1 ^ c2;} );
-		return std::reduce(std::begin(o1), std::end(o1), 0, [](unsigned int s, unsigned char c) {
-							while(c) { if (c & 1) s++; c >>= 1; return s;} );
- */	
+//		std::cout << "length = "<< s1.length() << " args = " << s1 << " & " << s2 << std::endl; 
 		for (int i = 0 ; i < s1.length() ; i++) {
-			std::cout << " i = " << s1[i] << "|" << s2[i] << " " << (s1[i] ^ s2[i]) << " hd = " << hd << std::endl;
+//			std::cout << " i = " << s1[i] << "|" << s2[i] << " " << (s1[i] ^ s2[i]) << " hd = " << hd << std::endl;
 			for (unsigned char t = s1[i] ^ s2[i] ; t ; t >>= 1)
 				if (t & 1)
 					hd++;
@@ -166,9 +151,12 @@ namespace cryptopals {
 	{
 		std::ifstream ip{filename};
 		const auto size = std::filesystem::file_size(filename);
-		std::string s{};
-		ip.read(s.data(), size);
-		return s;
+		std::string t{std::istreambuf_iterator<char>(ip), std::istreambuf_iterator<char>()};
+		std::string r{};
+		r.reserve(size);
+		auto it = std::copy_if(std::begin(t), std::end(t), std::back_inserter(r),[](char i) { return !(i == '\n' || i == '\r'); });
+		r.shrink_to_fit();	
+		return r;
 	}
 
 	unsigned int hamming_distance(const std::vector<std::byte>& v1, const std::vector<std::byte>& v2)
@@ -177,13 +165,6 @@ namespace cryptopals {
 		if ((v1.size() == 0) || (v1.size() != v2.size())) {
 			return hd;
 		}
- /*
-	std::vector<std::byte> o1;
-		std::transform(std::begin(v1), std::end(v1), std::begin(v2),
-						std::back_inserter(o1),
-						[](std::byte b1, std::byte b2) {return b1 ^ b2;} );
-		return std::accumulate(std::begin(o1), std::end(o1), 0, [](unsigned int s, std::byte c)->unsigned int{ while(c != std::byte{0}) { if ((c & std::byte{1}) == std::byte{1}) { s++; c >>= 1;} }return s; } );
-*/
 		for (int i = 0 ; i < v1.size() ; i++) {
 			for (std::byte t = v1[i] ^ v2[i] ; t != static_cast<std::byte>(0) ; t >>= 1)
 				if ((t & static_cast<std::byte>(1)) == static_cast<std::byte>(1))
@@ -191,5 +172,45 @@ namespace cryptopals {
 		}
 		return hd;
  
+	}
+	
+	unsigned int repeated_xor_key_size(const std::vector<std::byte>& v)
+	{
+		std::pair<unsigned int, unsigned int> lowestHdKey{0, 0xFFFFFFFF};
+		const auto max_samples = 10;
+		const auto max_keysz = 40;
+		for (unsigned int ks = 2 ; ks < max_keysz ; ks++) {
+			unsigned int tmp_hd = 0;
+			for (int offset = 0, sample_nums = 0  ; (sample_nums < max_samples) && (((max_samples + 1) * ks) <= v.size()) ; sample_nums++, offset += ks) {
+				std::vector<std::byte> v1{v.begin() + offset, v.begin() + offset + ks};
+				std::vector<std::byte> v2{v.begin() + offset + ks, v.begin() + offset + ks + ks};
+				auto t = hamming_distance(v1, v2);
+				//std::cout << "key size = " << ks << " hamming_distance = " << t << std::endl;
+				tmp_hd += t;
+			}
+			//std::cout << "key size = " << ks << " hamming_distance = " << tmp_hd << " final hamming_distance = " << tmp_hd / ks << std::endl;
+			tmp_hd /= ks;
+			if (lowestHdKey.second > tmp_hd) {
+				lowestHdKey.second = tmp_hd;
+				lowestHdKey.first = ks;
+			}
+		}
+		return lowestHdKey.first;
+	}
+	
+	std::vector<std::byte> get_repeated_xor_key(const unsigned int keysize, const std::vector<std::byte>& v)
+	{
+		std::vector<std::byte>tmp {v.size()/keysize};
+		std::vector<std::byte>key{};
+		for (unsigned int i = 0, blks = v.size()/keysize ; i < keysize ; i++) {
+			tmp.clear();
+			for (unsigned int j = 0; j < blks ; j++) {
+				tmp.push_back(v.at((j * keysize) + i));
+			}
+			auto k = most_probable_xor_enc_key(tmp);
+			key.push_back(k.second);
+//			std::cout << "key[" << i << "] = " << std::to_integer<int>(k.second) << std::endl; 
+		}
+		return key;
 	}
 }
