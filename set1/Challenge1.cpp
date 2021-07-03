@@ -88,6 +88,29 @@ namespace cryptopals::set1 {
 		//prntByteVector(key);
 		auto c = data ^ key;
 		std::for_each(c.begin(), c.end(), [](std::byte i) {std::cout << char(std::to_integer<int>(i));});
-		
 	}
+
+	void challenge7(void)
+	{
+		std::string ipdata = readall("./set1/7.txt");
+		const std::string skey{"YELLOW SUBMARINE"};
+		aesKey key;
+		skey.copy(reinterpret_cast<char*>(key.data()),skey.length()); 
+	
+		std::cout << "Challenge 7 : " << std::endl;
+	
+		const auto data = b64::decode(ipdata);
+		auto btochr = [](const byteVector &v) -> std::vector<unsigned char>{std::vector<unsigned char> r; for(auto i : v) r.push_back(std::to_integer<unsigned char>(i)); return r;};
+		auto cb = btochr(data);
+		auto pv = aes128_ecb_decrypt(cb, key);
+		if (pv.size())
+			std::for_each(pv.begin(), pv.end(), [](auto i) {std::cout << i ;});
+		else
+			std::cout << "error in decrypting" << std::endl;
+	}
+
+	void challenge8(void)
+	{
+
+	}	
 }

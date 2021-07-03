@@ -3,12 +3,16 @@
 
 #include <vector>
 #include <string>
+#include <array>
 
 namespace cryptopals {
 	class challenge {
 	public:
 		virtual void solution(void) = 0;
 	};
+	using byteVector = std::vector<std::byte>;
+	using aesKey = std::array<unsigned char, 16>;
+
 	static std::byte to_hex(unsigned char c);
 	std::vector<std::byte> operator ""_hex(const char* str, std::size_t s);
 	std::vector<std::byte> operator ^ (std::vector<std::byte> l, std::vector<std::byte> r);
@@ -20,6 +24,9 @@ namespace cryptopals {
 	std::string readall(std::string filename);
 	unsigned int repeated_xor_key_size(const std::vector<std::byte>& v);
 	std::vector<std::byte> get_repeated_xor_key(const unsigned int keysize, const std::vector<std::byte>& v);
+	
+	std::vector<unsigned char> aes128_ecb_decrypt(const std::vector<unsigned char>& c, const aesKey& key);
+	
 }
 
 #endif

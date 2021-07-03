@@ -8,5 +8,6 @@ int main()
     cryptopals::set1::challenge4();
     cryptopals::set1::challenge5();
 	cryptopals::set1::challenge6();
-
+	cryptopals::set1::challenge7();
+	cryptopals::set1::challenge8();
 }
