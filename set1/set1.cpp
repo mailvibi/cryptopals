@@ -145,4 +145,15 @@ namespace cryptopals::set1 {
 
 		}
 	}
+	void solution(void)
+	{
+		challenge1();
+		challenge2();
+		challenge3();
+		challenge4();
+		challenge5();
+		challenge6();
+		challenge7();
+		challenge8();
+	}
 }
