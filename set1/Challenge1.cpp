@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
+#include <unordered_set>
 #include "cryptopals.h"
 #include "base64.h"
 #include "set1.h"
@@ -109,8 +110,39 @@ namespace cryptopals::set1 {
 			std::cout << "error in decrypting" << std::endl;
 	}
 
+	struct ByteVectorHash {
+		size_t operator()(const std::vector<std::byte>& v) const {
+			std::hash<std::byte> hasher;
+			size_t seed = 0;
+			for (auto i : v) {
+				seed ^= hasher(i) << 1;
+			}
+			return seed;
+		}
+	};
+
 	void challenge8(void)
 	{
+		std::string filename{"./set1/8.txt"}, line;
+		std::ifstream ipfile(filename);
+		int linenum = 0;
+		auto prntByteVector = [](std::vector<std::byte>& v) {std::for_each(v.begin(), v.end(), [](std::byte i) {std::cout << std::hex << std::setfill('0') << std::setw(2)<< std::to_integer<int>(i);}); std::cout << std::endl;};
+		std::cout << "Challenge 8 : " << std::endl;
 
-	}	
+		while (std::getline(ipfile, line)) {
+			++linenum;
+			auto b = hexstringbytes(line);	
+			std::unordered_multiset<std::vector<std::byte>, ByteVectorHash> s;
+			for (auto i = 0 ; i < b.size() - 15 ; i += 16) {
+				std::vector<std::byte> v{b.begin() + i, b.begin() + i + 16};
+				s.insert(v);
+			}
+			for (auto i : s)
+				if (auto j = s.count(i) ; j > 1) {
+					std::cout << "probable ECB @ line = " << linenum << " pattern count repeated = " << j << std::endl;
+					break;
+				}
+
+		}
+	}
 }
