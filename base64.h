@@ -19,7 +19,7 @@
 namespace cryptopals {
 	class b64 {
 		public:
-			static std::string encode(std::vector<std::byte>& bytes)
+			static std::string encode(std::vector<unsigned char>& bytes)
 			{
 				const std::string& b64encode_map = get_encodeMap();
 				if (bytes.size() == 0) {
@@ -29,17 +29,17 @@ namespace cryptopals {
 				std::string ret;
 				unsigned int i = 0;
 				for (; i < bytes.size() - 2; i += 3) {
-					ret.push_back(b64encode_map[std::to_integer<int>(bytes[i]) >> 2]);
-					ret.push_back(b64encode_map[((std::to_integer<int>(bytes[i]) & 0x3) << 4) | ((std::to_integer<int>(bytes[i + 1]) >> 4) & 0xf)]);
-					ret.push_back(b64encode_map[((std::to_integer<int>(bytes[i + 1]) & 0xf) << 2) | ((std::to_integer<int>(bytes[i + 2]) >> 6) & 0x3)]);
-					ret.push_back(b64encode_map[std::to_integer<int>(bytes[i + 2]) & 0x3f]);
+					ret.push_back(b64encode_map[bytes[i] >> 2]);
+					ret.push_back(b64encode_map[((bytes[i] & 0x3) << 4) | ((bytes[i + 1] >> 4) & 0xf)]);
+					ret.push_back(b64encode_map[((bytes[i + 1] & 0xf) << 2) | ((bytes[i + 2] >> 6) & 0x3)]);
+					ret.push_back(b64encode_map[bytes[i + 2] & 0x3f]);
 				}
 				if (i < bytes.size()) {
-					ret.push_back(b64encode_map[std::to_integer<int>(bytes[i]) >> 2]);
-					ret.push_back(b64encode_map[(std::to_integer<int>(bytes[i]) & 0x3) << 4]);
+					ret.push_back(b64encode_map[bytes[i] >> 2]);
+					ret.push_back(b64encode_map[(bytes[i] & 0x3) << 4]);
 					if ((i + 1) < bytes.size()) {
-						ret.push_back(b64encode_map[((std::to_integer<int>(bytes[i]) & 0x3) << 4) | ((std::to_integer<int>(bytes[i + 1]) >> 4) & 0xf)]);
-						ret.push_back(b64encode_map[(std::to_integer<int>(bytes[i + 1]) & 0xf) << 2]);
+						ret.push_back(b64encode_map[((bytes[i] & 0x3) << 4) | ((bytes[i + 1] >> 4) & 0xf)]);
+						ret.push_back(b64encode_map[(bytes[i + 1] & 0xf) << 2]);
 					}
 					else {
 						ret.push_back('=');
@@ -48,9 +48,9 @@ namespace cryptopals {
 				}
 				return ret;
 			}
-			static std::vector<std::byte> decode(const std::string& s)
+			static std::vector<unsigned char> decode(const std::string& s)
 			{
-				std::vector<std::byte> ret;
+				std::vector<unsigned char> ret;
 				auto decode_map = get_decodeMap();
 				if(s.length() % 4) {
 					std::cout << "input string not multiple of 4 " << std::endl;
@@ -58,17 +58,17 @@ namespace cryptopals {
 				}
 				auto p = s.c_str();
 				for (int i = 0; i < s.length() ; i += 4) {
-					std::byte b;
-					b = std::byte{decode_map[static_cast<unsigned int>(p[i])] << 2}; 
-					b |= std::byte{(decode_map[static_cast<unsigned int>(p[i + 1])] >> 4) & std::byte{3}};
+					unsigned char b;
+					b = decode_map[p[i]] << 2; 
+					b |= (decode_map[p[i + 1]] >> 4) & 3;
 					ret.push_back(b);
 					
-					b = std::byte{decode_map[static_cast<unsigned int>(p[i + 1])] << 4}; 
-					b |= std::byte{decode_map[static_cast<unsigned int>(p[i + 2])] >> 2};
+					b = decode_map[static_cast<unsigned int>(p[i + 1])] << 4; 
+					b |= decode_map[static_cast<unsigned int>(p[i + 2])] >> 2;
 					ret.push_back(b);
 
-					b = std::byte{(decode_map[static_cast<unsigned int>(p[i + 2])] & std::byte{3}) << 6}; 
-					b |= std::byte{decode_map[static_cast<unsigned int>(p[i + 3])]};
+					b = (decode_map[p[i + 2]] & 3) << 6; 
+					b |= decode_map[p[i + 3]];
 					ret.push_back(b);
 				}
 				return ret;
@@ -78,12 +78,12 @@ namespace cryptopals {
 				static const std::string encode_map = { "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" };
 				return encode_map;
 			}
-			static std::array<std::byte, 256>& get_decodeMap(void) {
-				static std::array<std::byte, 256>decode_map{};
+			static std::array<unsigned char, 256>& get_decodeMap(void) {
+				static std::array<unsigned char, 256>decode_map{};
 				auto s = get_encodeMap();
 				unsigned int i = 0;
 				for (auto& c : s) {
-					decode_map[static_cast<unsigned int>(c)] = std::byte(i);
+					decode_map[c] = i;
 					++i;
 				}
 				return decode_map;
