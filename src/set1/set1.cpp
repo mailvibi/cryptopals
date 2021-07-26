@@ -156,3 +156,8 @@ namespace cryptopals::set1 {
 		challenge8();
 	}
 }
+
+int main()
+{
+	cryptopals::set1::solution();
+}
