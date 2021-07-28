@@ -4,7 +4,9 @@
 #include <fstream>
 #include <iomanip>
 #include <unordered_set>
-#include "cryptopals.h"
+#include "common_lib.h"
+#include "wcrypto.h"
+#include "xor_enc.h"
 #include "base64.h"
 #include "set1.h"
 
@@ -94,7 +96,7 @@ namespace cryptopals::set1 {
 	{
 		std::string ipdata = readall("./set1/7.txt");
 		const std::string skey{"YELLOW SUBMARINE"};
-		aesKey key;
+		aes128Key key;
 		skey.copy(reinterpret_cast<char*>(key.data()),skey.length()); 
 	
 		std::cout << "Challenge 7 : " << std::endl;

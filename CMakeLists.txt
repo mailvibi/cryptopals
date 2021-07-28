@@ -9,4 +9,17 @@ project(Cryptopals VERSION 1.0
 #target_include_directories(set1 PUBLIC src/set1)
 #target_include_directories(set1 PUBLIC include)
 #target_link_libraries(set1 crypto)
+#target_include_directories(set1 PUBLIC include)
+
+include_directories(include)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_library(common_lib src/lib/common_lib.cpp)
+add_library(wcrypto src/lib/wcrypto.cpp)
+add_library(xor_enc src/lib/xor_enc.cpp)
+
+set_target_properties(common_lib PROPERTIES CXX_EXTENSIONS OFF)
+
 add_subdirectory(src/set1)
